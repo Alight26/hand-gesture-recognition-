@@ -6,6 +6,7 @@ from mediapipe.tasks.python import vision
 mp_hands = mp.solutions.hands 
 hand = mp_hands.Hands()
 
+
 # Drawing and tracking the hand landmarks
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -25,16 +26,38 @@ with mp_hands.Hands(
         RGB_frame = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         result = hand.process(RGB_frame)
         if result.multi_hand_landmarks:
-            for hand_landmark in result.multi_hand_landmarks:
-                print(hand_landmark)
+            for hand_landmarks in result.multi_hand_landmarks:
+
                 mp_drawing.draw_landmarks(RGB_frame, 
-                                        hand_landmark, 
+                                        hand_landmarks, 
                                         mp_hands.HAND_CONNECTIONS, 
                                         mp_drawing_styles.get_default_hand_landmarks_style(),
                                         mp_drawing_styles.get_default_hand_connections_style())
-        flipped = cv.flip(RGB_frame, 1)
+                
 
-        cv.imshow('img', flipped)
+
+
+
+     
+        flipped = cv.flip(RGB_frame, 1)
+        # changing back to bgr
+        flipped_BGR = cv.cvtColor(flipped, cv.COLOR_RGB2BGR)
+
+        cv.imshow('img', flipped_BGR)
         k = cv.waitKey(30) & 0xff
         if k == ord('q'):
             break
+
+
+
+
+
+# This function should detect whether your pointer finger is up
+
+def pointer(hand_landmarks):
+    finger = []
+    landmarks = hand_landmarks.landmark
+
+    finger.append(landmarks[8].y < landmarks[6].y)
+
+    return finger.count(True)
